@@ -7,8 +7,9 @@
 
 import subprocess, sys
 
-# Install deps
+# Install deps — transformers from source required for gemma4 model type
 subprocess.check_call([sys.executable, "-m", "pip", "install", "-q",
+    "git+https://github.com/huggingface/transformers.git",
     "peft>=0.15.0", "accelerate>=0.35.0", "bitsandbytes>=0.45.0",
     "trl>=0.16.0", "huggingface_hub"])
 
