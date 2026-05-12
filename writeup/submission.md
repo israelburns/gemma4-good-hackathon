@@ -75,7 +75,7 @@ Jeremy has already been used in active litigation:
 
 ## A Global Perspective
 
-This build has a transatlantic dimension. ******* — our third collaborator, based in ***, Kenya — brings direct perspective on what the justice gap looks like outside the American legal system. In Kenya and across Sub-Saharan Africa, formal legal representation is inaccessible to the vast majority of people facing civil matters. ***'s contribution to this project is the reminder that "access to justice" is not a U.S. problem — it is a human problem, and any solution worth building must be portable, free, and self-hostable by communities that have never had access to $300/hour counsel.
+This build has a transatlantic dimension. *******, based in ***, Kenya, tested the platform and helped frame the story from the outside — the perspective of someone who lives the justice gap, not just reads about it. In Kenya and across Sub-Saharan Africa, formal legal representation is inaccessible to the vast majority of people facing civil matters. His perspective shaped a core requirement: any solution worth building must be portable, free, and self-hostable by communities that have never had access to $300/hour counsel.
 
 The choice of Gemma 4 open weights is partly an answer to that question. A model that runs locally, in any language it can be fine-tuned for, on any hardware available — that is a model that can reach ***.
 
@@ -115,6 +115,6 @@ Ask Jeremy anything:
 
 ## Team
 
-- **Israel "Ace" Burns** — Cornell Tech LLM '17, Builder, New York
-- ******* — Collaborator & Global Perspective, ***, Kenya
-- **Esco Obong** — Collaborator, New York
+- **Israel "Ace" Burns** — Cornell Tech LLM '17, Co-Founder, New York
+- **Esco Obong** — Co-Founder & Technical Lead, New York
+- ******* — Presenter & Global Tester, ***, Kenya

@@ -51,7 +51,7 @@ User Input → Gemma 4 E4B (NLU) → State Machine → Rule Engine → Risk Scor
 
 ## A Global Build
 
-This project has a transatlantic dimension. *******, based in ***, Kenya, is our third collaborator and brings direct perspective on the justice gap outside the U.S. legal system. His contribution shapes the global deployability requirement: the architecture must be portable, free, and self-hostable by communities that have never had access to $300/hour counsel. The choice of open weights is partly an answer to that.
+This project has a transatlantic dimension. *******, based in ***, Kenya, tested the platform and helped frame the global story — the perspective of someone who lives the justice gap. His input shapes a core requirement: the architecture must be portable, free, and self-hostable by communities that have never had access to $300/hour counsel. The choice of open weights is partly an answer to that.
 
 ## Training Data
 
@@ -94,9 +94,9 @@ This project has a transatlantic dimension. *******, based in ***, Kenya, is our
 
 ## Team
 
-- **Israel "Ace" Burns** — Cornell Tech LLM '17, Builder, New York
-- ******* — Collaborator & Global Perspective, ***, Kenya
-- **Esco Obong** — Collaborator, New York
+- **Israel "Ace" Burns** — Cornell Tech LLM '17, Co-Founder, New York
+- **Esco Obong** — Co-Founder & Technical Lead, New York
+- ******* — Presenter & Global Tester, ***, Kenya
 
 ## Deadline
 
