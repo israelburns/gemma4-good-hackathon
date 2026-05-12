@@ -105,13 +105,15 @@ if use_4bit:
         dtype=torch.bfloat16,
     )
 else:
-    # fp16 fallback for P100/older GPUs
+    # P100 (sm_60): load on CPU first to bypass CUDA kernel init crash,
+    # then move to GPU after weights are initialized
     model = AutoModelForCausalLM.from_pretrained(
         MODEL_ID,
-        device_map="auto",
+        device_map="cpu",
         token=HF_TOKEN,
         dtype=torch.float16,
     )
+    model = model.cuda()
 
 model = prepare_model_for_kbit_training(model)
 print(f"  Model loaded. Trainable params before LoRA: {sum(p.numel() for p in model.parameters() if p.requires_grad):,}")
