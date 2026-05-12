@@ -7,10 +7,15 @@
 
 import subprocess, sys
 
+# Install PyTorch with sm_60 (P100) support first — current Kaggle PyTorch drops sm_60
+subprocess.check_call([sys.executable, "-m", "pip", "install", "-q", "--upgrade",
+    "torch==2.1.2", "torchvision==0.16.2", "torchaudio==2.1.2",
+    "--index-url", "https://download.pytorch.org/whl/cu118"])
+
 # Install deps — transformers from source required for gemma4 model type
 subprocess.check_call([sys.executable, "-m", "pip", "install", "-q",
     "git+https://github.com/huggingface/transformers.git",
-    "peft>=0.15.0", "accelerate>=0.35.0", "bitsandbytes>=0.45.0",
+    "peft>=0.15.0", "accelerate>=0.35.0", "bitsandbytes>=0.41.0",
     "trl>=0.16.0", "huggingface_hub"])
 
 import torch, json, time, os
