@@ -81,23 +81,37 @@ from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training
 
 MODEL_ID = "google/gemma-4-E4B-it"
 
-print(f"\n[{time.strftime('%H:%M:%S')}] Loading {MODEL_ID} (4-bit)...")
-
-bnb_config = BitsAndBytesConfig(
-    load_in_4bit=True,
-    bnb_4bit_quant_type="nf4",
-    bnb_4bit_compute_dtype=torch.bfloat16,
-    bnb_4bit_use_double_quant=True,
-)
+# Detect GPU capability — P100 (sm_60) can't run bitsandbytes 4-bit
+cuda_cap = torch.cuda.get_device_capability(0)
+use_4bit = cuda_cap[0] >= 7  # sm_70+ required for bitsandbytes NF4
+print(f"\n[{time.strftime('%H:%M:%S')}] Loading {MODEL_ID} ({'4-bit NF4' if use_4bit else 'fp16 (old GPU)'})...")
+print(f"  CUDA capability: sm_{cuda_cap[0]}{cuda_cap[1]} — 4-bit: {use_4bit}")
 
 tokenizer = AutoTokenizer.from_pretrained(MODEL_ID, token=HF_TOKEN)
-model = AutoModelForCausalLM.from_pretrained(
-    MODEL_ID,
-    quantization_config=bnb_config,
-    device_map="auto",
-    token=HF_TOKEN,
-    torch_dtype=torch.bfloat16,
-)
+
+if use_4bit:
+    from transformers import BitsAndBytesConfig
+    bnb_config = BitsAndBytesConfig(
+        load_in_4bit=True,
+        bnb_4bit_quant_type="nf4",
+        bnb_4bit_compute_dtype=torch.bfloat16,
+        bnb_4bit_use_double_quant=True,
+    )
+    model = AutoModelForCausalLM.from_pretrained(
+        MODEL_ID,
+        quantization_config=bnb_config,
+        device_map="auto",
+        token=HF_TOKEN,
+        dtype=torch.bfloat16,
+    )
+else:
+    # fp16 fallback for P100/older GPUs
+    model = AutoModelForCausalLM.from_pretrained(
+        MODEL_ID,
+        device_map="auto",
+        token=HF_TOKEN,
+        dtype=torch.float16,
+    )
 
 model = prepare_model_for_kbit_training(model)
 print(f"  Model loaded. Trainable params before LoRA: {sum(p.numel() for p in model.parameters() if p.requires_grad):,}")
@@ -156,8 +170,9 @@ training_args = TrainingArguments(
     save_strategy="steps",
     save_steps=200,
     save_total_limit=2,
-    bf16=True,
-    optim="paged_adamw_8bit",
+    bf16=use_4bit,       # bf16 only on sm_70+ (T4/A100); fp16 on P100
+    fp16=not use_4bit,
+    optim="paged_adamw_8bit" if use_4bit else "adamw_torch",
     lr_scheduler_type="cosine",
     gradient_checkpointing=True,
     report_to="none",
