@@ -2,9 +2,21 @@
 
 ## The Problem
 
-80% of low-income Americans cannot afford a lawyer. Every year, millions of people face evictions, employment disputes, debt lawsuits, and civil rights violations with no legal help — because a lawyer costs $300+/hour. They file wrong forms. They miss deadlines. They lose cases they should have won.
+80% of low-income Americans cannot afford a lawyer. The number is worse globally — in Kenya, India, Nigeria, and across the developing world, the justice gap is not a statistic. It is a daily reality for millions of people facing evictions, wage theft, wrongful terminations, and civil rights violations with no one in their corner.
+
+A lawyer costs $300+/hour in the U.S. In ***, a single court filing can cost more than a month's income. People file wrong forms. They miss deadlines. They lose cases they should have won — not because they were wrong, but because they couldn't navigate a system built for lawyers.
 
 The legal system was built for lawyers. **Jeremy was built for everyone else.**
+
+## The Mission — Built to Be Free
+
+Jeremy AI is not a commercial product. It is a **nonprofit infrastructure project.**
+
+The decision to build on Gemma 4 open weights is not a technical preference — it is a mission requirement. When access to justice is the goal, a per-token API bill is not acceptable. Legal aid organizations, public defenders, courthouse self-help centers, and community legal clinics cannot afford subscription AI. They serve the people who need help most, with the least resources.
+
+Gemma 4 changes that equation. A self-hosted Jeremy can run on a single server, a donated laptop, or a legal aid nonprofit's existing infrastructure — anywhere in the world — at $0 per conversation, forever.
+
+This is what open weights makes possible: **AI that serves people, not margins.**
 
 ## What Jeremy Does
 
@@ -53,22 +65,29 @@ Fine-tuned Gemma 4 E4B-it with QLoRA (rank 16, 4-bit quantization) on **5,196 le
 | CourtListener API | 1,119 | Real case law extracts |
 | Court self-help guides | 111 | Official court procedures |
 
-Training ran on Kaggle free GPU (T4/P100) in under 2 hours.
+Training ran on Kaggle free GPU (T4) in under 2 hours at $0 cost.
 
 ## Real-World Impact
 
 Jeremy has already been used in active litigation:
 - **McDaniel v. City of New York** (Bronx County Supreme Court, 2026) — Section 1983 civil rights case against 6 NYPD officers. Jeremy helped draft the complaint, demand letter, and preservation notices.
-- Multiple pro se litigants guided through EEOC filings, contract disputes, and eviction defense.
+- Multiple pro se litigants guided through EEOC filings, contract disputes, and eviction defense across New York.
+
+## A Global Perspective
+
+This build has a transatlantic dimension. ******* — our third collaborator, based in ***, Kenya — brings direct perspective on what the justice gap looks like outside the American legal system. In Kenya and across Sub-Saharan Africa, formal legal representation is inaccessible to the vast majority of people facing civil matters. ***'s contribution to this project is the reminder that "access to justice" is not a U.S. problem — it is a human problem, and any solution worth building must be portable, free, and self-hostable by communities that have never had access to $300/hour counsel.
+
+The choice of Gemma 4 open weights is partly an answer to that question. A model that runs locally, in any language it can be fine-tuned for, on any hardware available — that is a model that can reach ***.
 
 ## What Gemma 4 Brings
 
 Why Gemma 4 over other models?
 
-1. **Size efficiency** — E4B runs on consumer hardware and mobile devices. Legal help shouldn't require a data center.
-2. **128K context** — Full complaints, contracts, and case law fit in a single prompt.
-3. **Open weights** — Self-hosted, no API costs. Access to justice shouldn't have a per-token fee.
-4. **Instruction-tuned** — Gemma 4's instruction following maps perfectly to procedural legal guidance.
+1. **Open weights — the mission requirement.** No API. No per-token cost. No vendor lock-in. Any legal aid org in the world can self-host this.
+2. **Size efficiency** — E4B runs on consumer hardware and mobile devices. Legal help shouldn't require a data center.
+3. **128K context** — Full complaints, contracts, and case law fit in a single prompt.
+4. **Instruction-tuned** — Gemma 4's instruction following maps directly to procedural legal guidance.
+5. **Global deployability** — Fine-tune once for any jurisdiction, any language. The architecture is portable.
 
 ## Cost
 
@@ -81,9 +100,13 @@ Why Gemma 4 over other models?
 | Voice (ElevenLabs, optional) | $5 |
 | **Total** | **$0 - $5** |
 
+This is the number that matters for legal aid organizations. $0 to run. $0 per conversation. No budget approval needed.
+
 ## Try It
 
-[Live Demo Link — Kaggle Notebook / HuggingFace Space]
+- **Live Demo:** [prosenetwork.org/demo](https://prosenetwork.org/demo)
+- **Model:** [huggingface.co/israelburns/jeremy-gemma4](https://huggingface.co/israelburns/jeremy-gemma4)
+- **Code:** [github.com/israelburns/gemma4-good-hackathon](https://github.com/israelburns/gemma4-good-hackathon)
 
 Ask Jeremy anything:
 - "I was served with a lawsuit in New York. I have 20 days to respond. What do I do?"
@@ -92,5 +115,6 @@ Ask Jeremy anything:
 
 ## Team
 
-- **Israel "Ace" Burns** — Cornell Tech LLM '17, Builder
-- **Esco Obong** — Collaborator
+- **Israel "Ace" Burns** — Cornell Tech LLM '17, Builder, New York
+- ******* — Collaborator & Global Perspective, ***, Kenya
+- **Esco Obong** — Collaborator, New York
