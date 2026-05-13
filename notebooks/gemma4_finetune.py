@@ -7,10 +7,15 @@
 
 import subprocess, sys
 
+# Pin torch 2.4.1+cu121 — last release with P100 (sm_60) kernel binaries
+subprocess.check_call([sys.executable, "-m", "pip", "install", "-q",
+    "torch==2.4.1", "torchvision==0.19.1",
+    "--index-url", "https://download.pytorch.org/whl/cu121"])
+
 # Install deps — transformers from source required for gemma4 model type
 subprocess.check_call([sys.executable, "-m", "pip", "install", "-q",
     "git+https://github.com/huggingface/transformers.git",
-    "peft>=0.15.0", "accelerate>=0.35.0", "bitsandbytes>=0.45.0",
+    "peft>=0.15.0", "accelerate>=1.0", "bitsandbytes>=0.43.3",
     "trl>=0.16.0", "huggingface_hub"])
 
 import torch, json, time, os

@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#080808">
+<script>
+  (function(){
+    try {
+      var t = localStorage.getItem('psn-theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', t);
+    } catch(e) { document.documentElement.setAttribute('data-theme','dark'); }
+  })();
+</script>
+<meta name="description" content="Pro Se Network — Free AI-powered legal guidance for self-represented litigants. Jeremy walks you through lawsuits, evictions, EEOC filings, and more — at no cost.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="manifest" href="/manifest.json">
+<title>Pro Se Network — Free NY Divorce Help</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+*{margin:0;padding:0;box-sizing:border-box;}
+:root, :root[data-theme="dark"]{
+  --bg:#080808;
+  --surface:#0f0f14;
+  --surface2:#18181f;
+  --gold:#D4AF37;
+  --gold-dim:rgba(212,175,55,0.15);
+  --brass:#B08D57;
+  --text:#e8e8f0;
+  --text2:#8888a0;
+  --green:#00b894;
+  --hero-overlay: linear-gradient(180deg, rgba(8,8,8,0.55) 0%, rgba(8,8,8,0.7) 100%);
+}
+:root[data-theme="light"]{
+  /* v1 canonical courthouse-marble tokens */
+  --navy:#0F1B2D;
+  --navy-deep:#0D1825;
+  --burgundy:#5A1F2B;
+  --brass:#B08D57;
+  --sandstone:#D6C4A3;
+  --steel:#C9CED6;
+  --marble-light:#F2EDE6;
+  --marble-mid:#E8E0D4;
+  --marble-dark:#D5CCC0;
+  --mahogany:#3B1A0A;
+  --mahogany-light:#5C2E1A;
+  --text-dark:#1A1A1A;
+  --text-mid:#4A4A4A;
+  --text-light:#7A7A7A;
+  --success:#2E6B47;
+  --alert:#8B2020;
+  --card-bg:#FAFAF7;
+  --card-border:#E0D8CC;
+  /* legacy alias map */
+  --bg:#F2EDE6;
+  --surface:#FAFAF7;
+  --surface2:#E8E0D4;
+  --gold:#B08D57;
+  --gold-dim:rgba(176,141,87,0.18);
+  --text:#1A1A1A;
+  --text2:#4A4A4A;
+  --green:#2E6B47;
+  --hero-overlay: linear-gradient(180deg, rgba(15,27,45,0.10) 0%, rgba(213,204,192,0.45) 100%);
+}
+:root[data-theme="light"]{
+  /* paint html + body with marble so nothing ever falls through to dark */
+  background: #F2EDE6;
+}
+:root[data-theme="light"] body{
+  background: linear-gradient(180deg, #F2EDE6 0%, #E8E0D4 60%, #D5CCC0 100%) !important;
+  color: var(--text-dark) !important;
+}
+:root[data-theme="light"] body::before{
+  content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(213,204,192,0.30) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, rgba(232,224,212,0.40) 0%, transparent 40%),
+    radial-gradient(ellipse at 50% 80%, rgba(214,196,163,0.15) 0%, transparent 60%);
+}
+
+/* === Light Mode v1 structural overrides === */
+:root[data-theme="light"] .hero{
+  background:
+    linear-gradient(180deg, var(--marble-light) 0%, var(--marble-mid) 100%);
+}
+:root[data-theme="light"] .hero h1{ color: var(--navy); }
+:root[data-theme="light"] .tagline,
+:root[data-theme="light"] .hero p{ color: var(--text-mid); }
+:root[data-theme="light"] .cta-btn,
+:root[data-theme="light"] .hero-btn.primary,
+:root[data-theme="light"] a.cta-btn{
+  background: var(--navy);
+  color: var(--sandstone);
+  border: 1.5px solid var(--navy);
+  box-shadow: 0 2px 8px rgba(15,27,45,0.25);
+}
+:root[data-theme="light"] .cta-btn:hover,
+:root[data-theme="light"] .hero-btn.primary:hover{
+  background: #162540;
+  transform: translateY(-1px);
+}
+:root[data-theme="light"] .section-title,
+:root[data-theme="light"] h2{ color: var(--navy); }
+:root[data-theme="light"] .section,
+:root[data-theme="light"] section p{ color: var(--text-mid); }
+:root[data-theme="light"] .card,
+:root[data-theme="light"] .quick-card{
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  color: var(--text-dark);
+}
+:root[data-theme="light"] .card:hover,
+:root[data-theme="light"] .quick-card:hover{ border-color: var(--brass); }
+
+/* ═══ SITE HEADER (chrome bar, holds brand + theme toggle inline) ═══ */
+.site-header{
+  position:sticky; top:0; z-index:50;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:12px 20px;
+  background:linear-gradient(180deg, rgba(8,8,8,0.92) 0%, rgba(8,8,8,0.78) 100%);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid rgba(212,175,55,0.18);
+}
+.site-header .brand{
+  font-family:'Playfair Display',serif;
+  font-weight:700; font-size:14px; letter-spacing:3px;
+  color:var(--gold); text-transform:uppercase;
+  text-decoration:none;
+}
+.site-header .brand .dot{
+  display:inline-block; width:6px; height:6px; border-radius:50%;
+  background:var(--brass); margin-right:8px; vertical-align:middle;
+  box-shadow:0 0 6px rgba(176,141,87,0.6);
+}
+.theme-toggle{
+  display:inline-flex; align-items:center; gap:7px;
+  background:transparent;
+  border:1px solid var(--gold-dim);
+  color:var(--text);
+  font-family:'IBM Plex Mono',monospace; font-size:10.5px;
+  padding:7px 14px; border-radius:999px; cursor:pointer;
+  letter-spacing:0.15em; text-transform:uppercase;
+  transition:transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+.theme-toggle::before{
+  content:''; width:6px; height:6px; border-radius:50%;
+  background:var(--brass); box-shadow:0 0 6px rgba(176,141,87,0.6);
+}
+.theme-toggle:hover{transform:translateY(-1px); border-color:var(--gold);}
+
+:root[data-theme="light"] .site-header{
+  background:linear-gradient(180deg, rgba(242,237,230,0.94) 0%, rgba(232,224,212,0.88) 100%);
+  border-bottom:1px solid rgba(176,141,87,0.35);
+  box-shadow:0 2px 14px rgba(15,27,45,0.06);
+}
+:root[data-theme="light"] .site-header .brand{ color:var(--navy); }
+:root[data-theme="light"] .theme-toggle{
+  color:var(--navy);
+  border-color:rgba(176,141,87,0.55);
+  background:rgba(255,255,255,0.4);
+}
+:root[data-theme="light"] .theme-toggle:hover{
+  border-color:var(--brass);
+  background:rgba(255,255,255,0.7);
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   LIGHT MODE — full courthouse-marble ethos
+   ════════════════════════════════════════════════════════════════════ */
+
+/* Hero — courthouse marble gradient, navy serif title, soft sub-text */
+:root[data-theme="light"] .hero{
+  background:
+    radial-gradient(ellipse 60% 45% at 50% 0%, rgba(255,255,255,0.55) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 40% at 18% 22%, rgba(176,141,87,0.10) 0%, transparent 60%),
+    radial-gradient(ellipse 45% 35% at 82% 76%, rgba(15,27,45,0.05) 0%, transparent 60%),
+    linear-gradient(180deg, var(--marble-light) 0%, var(--marble-mid) 100%) !important;
+  border-bottom: 1.5px solid var(--card-border);
+}
+/* Light-mode hero: keep same courtroom video as dark, but fade to marble at top + bottom
+   so the page reads as marble with a softer mid-band of courtroom video */
+:root[data-theme="light"] .hero-video{
+  opacity: 0.55 !important;
+  filter: brightness(1.18) saturate(0.85) !important;
+}
+:root[data-theme="light"] .hero-overlay{
+  background: linear-gradient(
+    180deg,
+    rgba(242,237,230,0.96) 0%,
+    rgba(242,237,230,0.55) 18%,
+    rgba(232,224,212,0.30) 50%,
+    rgba(232,224,212,0.55) 82%,
+    rgba(213,204,192,0.96) 100%
+  ) !important;
+}
+:root[data-theme="light"] .hero h1{
+  color: var(--navy) !important;
+  font-family: 'Playfair Display', serif !important;
+  font-weight: 900 !important;
+  letter-spacing: -1px !important;
+  font-size: clamp(34px, 5.5vw, 56px) !important;
+  text-shadow: 0 1px 2px rgba(255,255,255,0.4);
+}
+:root[data-theme="light"] .tagline,
+:root[data-theme="light"] .hero p{
+  color: var(--text-mid) !important;
+  font-family:'Inter',sans-serif !important;
+  font-size: clamp(15px, 2.2vw, 18px) !important;
+}
+
+/* Trust strip — IBM Plex Mono badges with brass-dot separators */
+.trust-strip{
+  display:inline-flex; flex-wrap:wrap; align-items:center; justify-content:center;
+  gap:14px; margin-top:24px;
+  padding:12px 22px; border-radius:9999px;
+  background:rgba(0,0,0,0.25);
+  border:1px solid var(--gold-dim);
+  font-family:'IBM Plex Mono',monospace; font-size:9.5px; letter-spacing:2px;
+  text-transform:uppercase; color:var(--text2); font-weight:600;
+}
+.trust-strip .sep{
+  width:4px; height:4px; border-radius:50%;
+  background:var(--brass); box-shadow:0 0 4px rgba(176,141,87,0.5);
+}
+:root[data-theme="light"] .trust-strip{
+  background:rgba(255,255,255,0.45);
+  border-color:rgba(176,141,87,0.30);
+  color:var(--text-mid);
+}
+
+/* Step stamps on feature cards */
+.card .stamp{
+  display:inline-block;
+  font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:700;
+  color:var(--gold); letter-spacing:3px;
+  padding:4px 10px; border-radius:4px;
+  background:rgba(212,175,55,0.10);
+  border:1px solid rgba(212,175,55,0.25);
+  margin-bottom:6px; width:fit-content;
+}
+:root[data-theme="light"] .card .stamp{
+  color:var(--brass);
+  background:rgba(176,141,87,0.10);
+  border-color:rgba(176,141,87,0.30);
+}
+
+/* Testimonial strip (burgundy-tinted) */
+.testimonial-strip{
+  position:relative; padding:64px 22px; text-align:center;
+  background:rgba(212,175,55,0.04);
+  border-top:1px solid rgba(212,175,55,0.10);
+  border-bottom:1px solid rgba(212,175,55,0.10);
+}
+.testimonial-strip blockquote{
+  font-family:'Playfair Display',serif; font-style:italic; font-weight:500;
+  font-size:clamp(18px,3vw,26px); line-height:1.35;
+  color:var(--gold); max-width:760px; margin:0 auto 16px;
+  letter-spacing:-0.2px;
+}
+.testimonial-strip cite{
+  display:inline-flex; align-items:center; gap:8px;
+  font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:3px;
+  color:var(--text2); text-transform:uppercase; font-style:normal; font-weight:600;
+}
+.testimonial-strip cite::before{
+  content:''; width:18px; height:1px; background:var(--brass);
+}
+:root[data-theme="light"] .testimonial-strip{
+  background:rgba(90,31,43,0.04) !important;
+  border-top-color:rgba(90,31,43,0.10) !important;
+  border-bottom-color:rgba(90,31,43,0.10) !important;
+}
+:root[data-theme="light"] .testimonial-strip blockquote{
+  color:var(--burgundy) !important;
+}
+:root[data-theme="light"] .testimonial-strip cite{
+  color:var(--mahogany-light) !important;
+}
+
+/* Final CTA strip — navy gradient with brass top-rule */
+.final-cta{
+  position:relative; padding:64px 22px; text-align:center;
+  background:linear-gradient(180deg, #050505 0%, #0a0a0a 100%);
+  border-top:2px solid var(--gold);
+  overflow:hidden;
+}
+.final-cta::before{
+  content:''; position:absolute; inset:0; pointer-events:none;
+  background:radial-gradient(ellipse 60% 50% at 50% 0%, rgba(212,175,55,0.10) 0%, transparent 70%);
+}
+.final-cta h2{
+  font-family:'Playfair Display',serif; font-weight:700;
+  font-size:clamp(22px,3.5vw,32px); color:var(--text); margin-bottom:20px;
+  letter-spacing:-0.2px; position:relative;
+}
+:root[data-theme="light"] .final-cta{
+  background:linear-gradient(180deg, var(--navy-deep) 0%, var(--navy) 100%) !important;
+  border-top:2px solid var(--brass) !important;
+}
+:root[data-theme="light"] .final-cta h2{ color:var(--sandstone) !important; }
+:root[data-theme="light"] .final-cta .cta-btn{
+  background:linear-gradient(145deg, #c9a570 0%, var(--brass) 50%, #8a6d3f 100%) !important;
+  color:var(--navy) !important;
+  border:1px solid rgba(255,255,255,0.18) !important;
+  box-shadow:0 8px 22px rgba(176,141,87,0.30), inset 0 1px 0 rgba(255,255,255,0.30) !important;
+}
+
+/* CTA — navy gradient with inset highlight + lift */
+:root[data-theme="light"] .cta-btn{
+  background: linear-gradient(145deg, #1a2d4a 0%, var(--navy) 50%, #0a1520 100%) !important;
+  color: var(--sandstone) !important;
+  border: 1.5px solid rgba(255,255,255,0.08) !important;
+  box-shadow: 0 4px 15px rgba(15,27,45,0.35), inset 0 1px 0 rgba(255,255,255,0.08) !important;
+  transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+}
+:root[data-theme="light"] .cta-btn:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(15,27,45,0.45), inset 0 1px 0 rgba(255,255,255,0.12) !important;
+}
+
+/* Sections + body underneath — pure marble */
+:root[data-theme="light"] .section,
+:root[data-theme="light"] .about{
+  background: transparent !important;
+  color: var(--text-mid) !important;
+  position: relative; z-index: 1;
+}
+:root[data-theme="light"] .section-title,
+:root[data-theme="light"] .about h2,
+:root[data-theme="light"] h2,
+:root[data-theme="light"] h3{
+  color: var(--navy) !important;
+  font-family: 'Playfair Display', serif;
+}
+
+/* Cards — gradient cream with inset highlight, brass hover */
+:root[data-theme="light"] .cards{ background: transparent !important; }
+:root[data-theme="light"] .card{
+  background: linear-gradient(145deg, rgba(255,255,255,0.95) 0%, rgba(250,250,247,0.85) 100%) !important;
+  border: 1.5px solid var(--card-border) !important;
+  color: var(--text-dark) !important;
+  box-shadow: 0 2px 8px rgba(15,27,45,0.05), inset 0 1px 0 rgba(255,255,255,0.9) !important;
+}
+:root[data-theme="light"] .card:hover{
+  border-color: var(--brass) !important;
+  box-shadow: 0 6px 18px rgba(176,141,87,0.18), inset 0 1px 0 rgba(255,255,255,0.9) !important;
+  transform: translateY(-2px);
+}
+:root[data-theme="light"] .card-icon{ filter: none !important; }
+:root[data-theme="light"] .card h3{ color: var(--navy) !important; }
+:root[data-theme="light"] .card p{ color: var(--text-mid) !important; }
+
+/* Badges — IBM Plex Mono navy chips */
+:root[data-theme="light"] .badge-chat,
+:root[data-theme="light"] .badge-workflow{
+  background: var(--navy) !important;
+  color: var(--sandstone) !important;
+  font-family: 'IBM Plex Mono', monospace !important;
+  letter-spacing: 1px;
+}
+
+/* About section in light mode — sit on marble */
+:root[data-theme="light"] .footer-video-section{
+  background:transparent !important;
+}
+:root[data-theme="light"] .footer-video{ display:none !important; }
+:root[data-theme="light"] .footer-overlay{ display:none !important; }
+:root[data-theme="light"] .about{ background:transparent !important; }
+:root[data-theme="light"] .about h2{
+  color:var(--navy) !important;
+  font-family:'Playfair Display',serif !important;
+}
+:root[data-theme="light"] .about p{ color:var(--text-mid) !important; }
+:root[data-theme="light"] .about a{ color:var(--brass) !important; }
+
+/* Footer — mahogany band with sandstone IBM Plex Mono text + brass divider line */
+:root[data-theme="light"] .footer{
+  position:relative;
+  background: linear-gradient(180deg, var(--mahogany-light) 0%, var(--mahogany) 100%) !important;
+  color: var(--sandstone) !important;
+  border-top: 1px solid rgba(176,141,87,0.45) !important;
+  margin-top:0 !important;
+}
+:root[data-theme="light"] .footer::before{
+  content:''; position:absolute; left:0; right:0; top:-1px; height:1px;
+  background: linear-gradient(90deg, transparent 0%, var(--brass) 50%, transparent 100%);
+}
+:root[data-theme="light"] .footer .footer-links a{
+  color: rgba(214,196,163,0.85) !important;
+  font-family:'IBM Plex Mono',monospace !important;
+  font-size:11px !important; letter-spacing:0.5px !important;
+}
+:root[data-theme="light"] .footer .footer-links a:hover{ color: var(--brass) !important; }
+:root[data-theme="light"] .footer .disclaimer{
+  color: rgba(214,196,163,0.55) !important;
+  font-family:'IBM Plex Mono',monospace !important;
+  font-size:10.5px !important; letter-spacing:0.3px !important;
+}
+
+/* Modals — navy overlay, cream gradient card */
+:root[data-theme="light"] .modal-overlay{
+  background: rgba(15,27,45,0.94) !important;
+}
+:root[data-theme="light"] .modal-card{
+  background: linear-gradient(145deg, rgba(255,255,255,0.98) 0%, rgba(250,250,247,0.92) 100%) !important;
+  border: 1.5px solid var(--card-border) !important;
+  color: var(--text-dark) !important;
+  box-shadow: 0 20px 60px rgba(15,27,45,0.5), inset 0 1px 0 rgba(255,255,255,0.9) !important;
+}
+:root[data-theme="light"] .modal-card h2,
+:root[data-theme="light"] .modal-card h3{ color: var(--navy) !important; font-family: 'Playfair Display', serif; }
+:root[data-theme="light"] .modal-sub,
+:root[data-theme="light"] .modal-points li{ color: var(--text-mid) !important; }
+:root[data-theme="light"] .modal-icon{ filter: none !important; }
+:root[data-theme="light"] .modal-btn-primary{
+  background: linear-gradient(145deg, #1a2d4a, var(--navy)) !important;
+  color: var(--sandstone) !important;
+  box-shadow: 0 4px 15px rgba(15,27,45,0.35), inset 0 1px 0 rgba(255,255,255,0.08) !important;
+}
+:root[data-theme="light"] .modal-btn-secondary{
+  background: linear-gradient(145deg, rgba(255,255,255,0.9), rgba(232,224,212,0.8)) !important;
+  color: var(--navy) !important;
+  border: 1.5px solid rgba(15,27,45,0.15) !important;
+}
+:root[data-theme="light"] .modal-btn-secondary:hover{ border-color: var(--brass) !important; }
+
+html{scroll-behavior:smooth;}
+body{
+  background:var(--bg);color:var(--text);
+  font-family:'Inter',sans-serif;min-height:100vh;
+}
+
+/* ═══ HERO ═══ */
+.hero{
+  position:relative;overflow:hidden;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  min-height:80vh;text-align:center;padding:40px 20px;
+  background:
+    radial-gradient(ellipse at 50% 30%, rgba(212,175,55,0.06) 0%, transparent 60%),
+    url('hero-poster.jpg') center center / cover no-repeat,
+    var(--bg);
+  isolation:isolate;
+}
+.hero-video{
+  position:absolute;inset:0;
+  width:100%;height:100%;
+  object-fit:cover;z-index:0;
+  object-position:center center;
+  pointer-events:none;
+}
+.hero-overlay{
+  position:absolute;inset:0;z-index:1;
+  background: var(--hero-overlay);
+}
+.hero > *:not(.hero-video):not(.hero-overlay){
+  position:relative;z-index:2;
+}
+@media(prefers-reduced-motion:reduce){
+  .hero-video{display:none;}
+}
+
+.logo-wrap{
+  width:260px;height:260px;margin-bottom:32px;
+  position:relative;
+  overflow:visible;
+  animation:float 4s ease-in-out infinite;
+}
+.logo-wrap img,.logo-wrap svg{width:100%;height:100%;}
+
+@keyframes float{
+  0%,100%{transform:translateY(0);}
+  50%{transform:translateY(-12px);}
+}
+
+.hero h1{
+  font-family:'Playfair Display',serif;font-size:clamp(28px,5vw,48px);
+  font-weight:900;color:var(--gold);letter-spacing:2px;margin-bottom:12px;
+}
+
+.hero .tagline{
+  font-size:clamp(14px,2.5vw,18px);color:var(--text2);
+  font-family:'IBM Plex Mono',monospace;margin-bottom:40px;max-width:500px;
+}
+
+.cta-btn{
+  display:inline-flex;align-items:center;gap:10px;
+  background:linear-gradient(135deg, var(--gold), var(--brass));
+  color:#080808;font-weight:700;font-size:18px;
+  padding:16px 40px;border-radius:12px;border:none;
+  cursor:pointer;text-decoration:none;font-family:'Inter',sans-serif;
+  transition:transform 0.2s, box-shadow 0.2s;
+  box-shadow:0 4px 24px rgba(212,175,55,0.3);
+}
+.cta-btn:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(212,175,55,0.4);}
+.cta-btn:active{transform:scale(0.97);}
+
+/* ═══ CASE CARDS ═══ */
+.section{padding:60px 20px;max-width:1000px;margin:0 auto;}
+
+.section-title{
+  font-family:'Playfair Display',serif;font-size:clamp(22px,4vw,32px);
+  font-weight:900;color:var(--gold);text-align:center;margin-bottom:40px;
+  letter-spacing:1px;
+}
+
+.cards{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:20px;
+}
+
+.card{
+  background:var(--surface);border:1px solid rgba(212,175,55,0.12);
+  border-radius:14px;padding:28px 24px;cursor:pointer;
+  text-decoration:none;color:var(--text);
+  transition:transform 0.2s, border-color 0.3s, box-shadow 0.3s;
+  display:flex;flex-direction:column;gap:10px;
+}
+.card:hover{
+  transform:translateY(-4px);border-color:var(--gold);
+  box-shadow:0 8px 32px rgba(212,175,55,0.12);
+}
+
+.card-icon{font-size:32px;margin-bottom:4px;}
+.card h3{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--gold);}
+.card p{font-size:14px;color:var(--text2);line-height:1.6;}
+.card .badge{
+  display:inline-block;font-size:11px;font-weight:600;
+  padding:4px 10px;border-radius:8px;margin-top:4px;width:fit-content;
+  font-family:'IBM Plex Mono',monospace;
+}
+.badge-chat{background:rgba(0,184,148,0.15);color:var(--green);}
+.badge-workflow{background:var(--gold-dim);color:var(--gold);}
+
+/* ═══ MEET JEREMY (promo video block) ═══ */
+.meet-jeremy{
+  position:relative;
+  padding: clamp(48px, 8vw, 96px) 24px clamp(56px, 9vw, 104px);
+  text-align:center;
+  background: linear-gradient(180deg, rgba(11,13,20,0.96) 0%, rgba(8,10,15,1) 100%);
+  border-top: 1px solid rgba(212,175,55,0.18);
+  border-bottom: 1px solid rgba(212,175,55,0.18);
+  z-index:2;
+}
+.meet-jeremy-eyebrow{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:11px; letter-spacing:0.32em; text-transform:uppercase;
+  color: var(--gold); margin-bottom: 14px;
+}
+.meet-jeremy h2{
+  font-family:'Playfair Display',serif; font-weight:900;
+  font-size: clamp(28px, 4.4vw, 44px);
+  color: var(--gold);
+  letter-spacing:-0.5px;
+  margin: 0 0 12px 0;
+}
+.meet-jeremy-sub{
+  max-width: 560px; margin: 0 auto 32px;
+  font-family:'Inter',sans-serif; font-size:16px; line-height:1.55;
+  color: var(--text2);
+}
+.meet-jeremy-frame{
+  position: relative;
+  display:inline-block;
+  width: min(360px, 86vw);
+  aspect-ratio: 9 / 16;
+  border-radius: 18px;
+  overflow:hidden;
+  background:#000;
+  border: 2px solid rgba(212,175,55,0.42);
+  box-shadow:
+    0 18px 48px rgba(0,0,0,0.55),
+    0 0 32px rgba(212,175,55,0.20),
+    inset 0 1px 0 rgba(255,255,255,0.08);
+  cursor: pointer;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+}
+.meet-jeremy-frame:hover{
+  border-color: var(--gold);
+  box-shadow:
+    0 22px 56px rgba(0,0,0,0.62),
+    0 0 48px rgba(212,175,55,0.42),
+    inset 0 1px 0 rgba(255,255,255,0.10);
+  transform: translateY(-2px);
+}
+.meet-jeremy-video{ width:100%; height:100%; object-fit:cover; display:block; }
+.meet-jeremy-hint{
+  position: absolute; left: 50%; bottom: 14px;
+  transform: translateX(-50%);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px; letter-spacing: 0.32em; text-transform: uppercase;
+  color: rgba(255,255,255,0.92);
+  background: rgba(0,0,0,0.55); backdrop-filter: blur(4px);
+  padding: 6px 12px; border-radius: 999px;
+  border: 1px solid rgba(212,175,55,0.45);
+  pointer-events: none;
+  opacity: 0.92;
+  transition: opacity 0.2s ease;
+}
+.meet-jeremy-frame.audio-on .meet-jeremy-hint{ opacity: 0; }
+
+/* Light Mode — courthouse marble palette */
+:root[data-theme="light"] .meet-jeremy{
+  background: linear-gradient(180deg, var(--marble-mid) 0%, var(--marble-light) 100%) !important;
+  border-top: 1px solid var(--card-border) !important;
+  border-bottom: 1px solid var(--card-border) !important;
+}
+:root[data-theme="light"] .meet-jeremy-eyebrow{ color: var(--brass) !important; }
+:root[data-theme="light"] .meet-jeremy h2{ color: var(--navy) !important; }
+:root[data-theme="light"] .meet-jeremy-sub{ color: var(--text-mid) !important; }
+:root[data-theme="light"] .meet-jeremy-frame{
+  border: 1.5px solid var(--brass) !important;
+  background: var(--card-bg) !important;
+  box-shadow:
+    0 14px 36px rgba(15,27,45,0.16),
+    0 0 24px rgba(176,141,87,0.18),
+    inset 0 1px 0 rgba(255,255,255,0.9) !important;
+}
+:root[data-theme="light"] .meet-jeremy-frame:hover{
+  border-color: var(--burgundy) !important;
+  box-shadow:
+    0 18px 44px rgba(15,27,45,0.22),
+    0 0 36px rgba(176,141,87,0.32),
+    inset 0 1px 0 rgba(255,255,255,0.95) !important;
+}
+:root[data-theme="light"] .meet-jeremy-hint{
+  background: rgba(15,27,45,0.86) !important;
+  color: var(--sandstone) !important;
+  border: 1px solid var(--brass) !important;
+}
+
+/* ═══ FOOTER VIDEO SECTION ═══ */
+.footer-video-section{
+  position:relative;overflow:hidden;
+  background:url('footer-poster.jpg') center 38% / cover no-repeat;
+  isolation:isolate;
+}
+.footer-video{
+  position:absolute;inset:0;
+  width:100%;height:100%;
+  object-fit:cover;z-index:0;
+  object-position:center 38%;
+  pointer-events:none;
+}
+.footer-overlay{
+  position:absolute;inset:0;z-index:1;
+  background:linear-gradient(180deg, rgba(8,8,8,0.8) 0%, rgba(8,8,8,0.6) 40%, rgba(8,8,8,0.85) 100%);
+}
+.footer-video-section > *:not(.footer-video):not(.footer-overlay){
+  position:relative;z-index:2;
+}
+
+/* ═══ ABOUT ═══ */
+.about{
+  max-width:700px;margin:0 auto;text-align:center;
+  padding:60px 20px 40px;
+}
+.about h2{
+  font-family:'Playfair Display',serif;font-size:24px;font-weight:900;
+  color:var(--gold);margin-bottom:16px;
+}
+.about p{font-size:15px;color:var(--text2);line-height:1.8;margin-bottom:12px;}
+.about a{color:var(--gold);text-decoration:underline;}
+
+/* ═══ FOOTER ═══ */
+.footer{
+  text-align:center;padding:40px 20px;
+  border-top:1px solid rgba(212,175,55,0.1);margin-top:40px;
+}
+.footer-links{display:flex;gap:20px;justify-content:center;flex-wrap:wrap;margin-bottom:16px;}
+.footer-links a{color:var(--brass);font-size:13px;text-decoration:none;font-family:'IBM Plex Mono',monospace;}
+.footer-links a:hover{color:var(--gold);}
+.footer .disclaimer{font-size:11px;color:var(--text2);max-width:600px;margin:0 auto;line-height:1.6;}
+
+@media(max-width:600px){
+  .hero{min-height:74svh;padding:40px 16px 36px;}
+  .hero-video{
+    display:block;
+    object-position:center center;
+    opacity:0.82;
+  }
+  .hero-overlay{
+    background:linear-gradient(180deg, rgba(8,8,8,0.46) 0%, rgba(8,8,8,0.76) 100%);
+  }
+  .footer-video-section{min-height:320px;}
+  .footer-video{
+    display:block;
+    object-position:center 35%;
+    opacity:0.78;
+  }
+  .footer-overlay{
+    background:linear-gradient(180deg, rgba(8,8,8,0.72) 0%, rgba(8,8,8,0.56) 38%, rgba(8,8,8,0.84) 100%);
+  }
+  .logo-wrap{width:168px;height:168px;}
+  .cards{grid-template-columns:1fr;}
+  .section{padding:40px 16px;}
+}
+@media(prefers-reduced-motion:reduce){
+  .footer-video{display:none;}
+}
+
+/* ═══ DISCLAIMER MODAL ═══ */
+.modal-overlay{
+  position:fixed;inset:0;z-index:1000;
+  background:rgba(0,0,0,0.85);backdrop-filter:blur(6px);
+  display:none;align-items:center;justify-content:center;
+  padding:20px;
+  animation:fadeIn 0.2s ease;
+}
+.modal-overlay.active{display:flex;}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+.modal-card{
+  background:var(--surface);
+  border:1px solid rgba(212,175,55,0.25);
+  border-radius:16px;
+  max-width:520px;width:100%;
+  padding:36px 32px 28px;
+  box-shadow:0 20px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(212,175,55,0.1);
+  text-align:left;
+  animation:slideUp 0.25s ease;
+}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+.modal-icon{
+  width:56px;height:56px;border-radius:14px;
+  background:linear-gradient(135deg,var(--gold),var(--brass));
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 18px;font-size:28px;
+}
+.modal-card h2{
+  font-family:'Playfair Display',serif;
+  font-size:24px;font-weight:700;color:var(--gold);
+  text-align:center;margin-bottom:8px;
+}
+.modal-sub{
+  text-align:center;color:var(--text2);font-size:13px;
+  font-family:'IBM Plex Mono',monospace;letter-spacing:1px;
+  text-transform:uppercase;margin-bottom:24px;
+}
+.modal-points{
+  list-style:none;padding:0;margin:0 0 26px;
+}
+.modal-points li{
+  font-size:14px;color:var(--text);line-height:1.7;
+  padding:10px 0 10px 28px;position:relative;
+  border-bottom:1px solid rgba(212,175,55,0.08);
+}
+.modal-points li:last-child{border-bottom:none;}
+.modal-points li::before{
+  content:'';position:absolute;left:6px;top:18px;
+  width:8px;height:8px;border-radius:50%;
+  background:var(--gold);box-shadow:0 0 8px rgba(212,175,55,0.5);
+}
+.modal-actions{
+  display:flex;gap:12px;margin-top:8px;
+}
+.modal-btn{
+  flex:1;padding:14px 20px;border-radius:10px;border:none;
+  font-family:'Inter',sans-serif;font-size:14px;font-weight:600;
+  cursor:pointer;transition:all 0.2s;
+}
+.modal-btn-primary{
+  background:linear-gradient(135deg,var(--gold),var(--brass));
+  color:#080808;
+  box-shadow:0 4px 16px rgba(212,175,55,0.3);
+}
+.modal-btn-primary:hover{
+  transform:translateY(-1px);
+  box-shadow:0 6px 20px rgba(212,175,55,0.4);
+}
+.modal-btn-secondary{
+  background:transparent;color:var(--text2);
+  border:1px solid rgba(255,255,255,0.1);
+}
+.modal-btn-secondary:hover{
+  color:var(--text);border-color:rgba(255,255,255,0.2);
+}
+@media(max-width:520px){
+  .modal-card{padding:28px 22px 22px;}
+  .modal-card h2{font-size:20px;}
+  .modal-actions{flex-direction:column-reverse;}
+}
+</style>
+</head>
+<body>
+<!-- HACKATHON BANNER -->
+<div style="background:#1a1a2e;color:#FFD21E;text-align:center;padding:8px 16px;font-size:13px;font-family:sans-serif;border-bottom:1px solid #FFD21E33;letter-spacing:0.02em;">
+  🏆 Built for the <a href="https://www.kaggle.com/competitions/gemma-4-good-hackathon" target="_blank" rel="noopener" style="color:#FFD21E;text-decoration:underline;">Kaggle Gemma 4 Good Hackathon</a>  ·  <a href="https://huggingface.co/israelburns/jeremy-gemma4" target="_blank" rel="noopener" style="color:#FFD21E;text-decoration:underline;">Jeremy LoRA Adapter on HuggingFace</a>  ·  <a href="https://github.com/israelburns/gemma4-good-hackathon" target="_blank" rel="noopener" style="color:#FFD21E;text-decoration:underline;">GitHub</a>
+</div>
+
+<!-- SITE HEADER (chrome bar — brand + theme toggle inline) -->
+<header class="site-header" role="banner">
+  <a href="/" class="brand"><span class="dot"></span>Pro Se Network</a>
+  <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle Light Mode (paired Jeremy + palette swap)">Light</button>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <video class="hero-video" autoplay muted loop playsinline poster="hero-poster.jpg">
+    <source src="hero-bg.mp4" type="video/mp4">
+  </video>
+  <div class="hero-overlay"></div>
+  <div class="logo-wrap">
+    <img src="/jeremy-logo.svg" alt="Pro Se Network" style="position:absolute;top:10px;left:10px;width:calc(100% - 20px);height:calc(100% - 20px);opacity:0.02;">
+    <canvas id="scales3d" width="520" height="520" style="width:100%;height:100%;display:block;"></canvas>
+  </div>
+  <h1>Pro Se Network</h1>
+  <p class="tagline">Free New York uncontested divorce — start to finish.</p>
+  <a href="#" data-chat-link="/general/" class="cta-btn">Ask Jeremy a legal question</a>
+  <div class="trust-strip" aria-label="Trust signals">
+    <span>Filed in all 5 boroughs</span>
+    <span class="sep" aria-hidden="true"></span>
+    <span>Supreme Court of NY</span>
+    <span class="sep" aria-hidden="true"></span>
+    <span>100% Free</span>
+  </div>
+</section>
+
+<!-- DIVORCE FLOW -->
+<section class="section">
+  <h2 class="section-title">What Jeremy Does</h2>
+  <div class="cards">
+
+    <a href="#" data-chat-link="/general/" class="card">
+      <span class="stamp">01</span>
+      <div class="card-icon">&#128221;</div>
+      <h3>Uncontested Divorce Intake</h3>
+      <p>Start here. Jeremy walks you through the intake fields, verifies your jurisdiction, and confirms both spouses agree on the terms before any paperwork begins.</p>
+      <span class="badge badge-chat">AI Chat</span>
+    </a>
+
+    <a href="#" data-chat-link="/general/" class="card">
+      <span class="stamp">02</span>
+      <div class="card-icon">&#9878;</div>
+      <h3>UD-1 through UD-10 Packet</h3>
+      <p>Jeremy drafts every required form — Summons, Verified Complaint, Affidavit of Service, and all nine UD forms — then guides you through the NYSCEF upload, step by step.</p>
+      <span class="badge badge-workflow">Workflow</span>
+    </a>
+
+  </div>
+</section>
+
+<!-- TESTIMONIAL STRIP -->
+<section class="testimonial-strip" aria-label="Testimonial">
+  <blockquote>I filed my divorce on a Tuesday. The clerk accepted everything on the first try.</blockquote>
+  <cite>L.M., Bronx, 2025</cite>
+</section>
+
+<!-- FINAL CTA STRIP -->
+<section class="final-cta">
+  <h2>Ready when you are.</h2>
+  <a href="#" data-chat-link="/general/" class="cta-btn">Ask Jeremy now</a>
+</section>
+
+<!-- MEET JEREMY — promo video, theme-swap (Black for dark, White for light) -->
+<section class="meet-jeremy" aria-labelledby="meet-jeremy-title">
+  <div class="meet-jeremy-eyebrow">SEE HIM IN ACTION</div>
+  <h2 id="meet-jeremy-title">Meet Jeremy</h2>
+  <p class="meet-jeremy-sub">A free AI legal assistant trained on New York uncontested divorce. Walk through every form, every filing, every step.</p>
+  <div class="meet-jeremy-frame">
+    <video id="meetJeremyVideo" class="meet-jeremy-video" autoplay muted loop playsinline preload="metadata"></video>
+    <div class="meet-jeremy-hint" aria-hidden="true">HOVER&nbsp;FOR&nbsp;SOUND</div>
+  </div>
+  <script>
+    (function(){
+      var v = document.getElementById('meetJeremyVideo');
+      var frame = v.parentElement;
+      // cache-bust so the asset reload across deploys never gets stuck on stale theme video
+      var BUST = 'v=' + (window.PSN_VIDEO_VERSION || '20260502b');
+      function srcForTheme(){
+        var t = document.documentElement.getAttribute('data-theme') || 'dark';
+        var path = t === 'light'
+          ? '/assets/jeremy_light/video/demos/jeremy_light_demo.mp4'
+          : '/assets/jeremy/video/demos/jeremy_dark_demo.mp4';
+        return path + '?' + BUST;
+      }
+      function applySrc(){
+        var url = srcForTheme();
+        if (v.currentSrc && v.currentSrc.indexOf(url.split('?')[0]) !== -1) return;
+        v.src = url;
+        v.load();
+        var p = v.play(); if (p && p.catch) p.catch(function(){});
+      }
+      applySrc();
+      window.addEventListener('psn-theme-change', applySrc);
+      // Hover/tap to unmute, leave/blur to mute again. Touch users get a tap toggle.
+      function unmute(){ v.muted = false; v.volume = 1.0; var p=v.play(); if(p&&p.catch)p.catch(function(){}); frame.classList.add('audio-on'); }
+      function mute(){ v.muted = true; frame.classList.remove('audio-on'); }
+      frame.addEventListener('mouseenter', unmute);
+      frame.addEventListener('mouseleave', mute);
+      frame.addEventListener('focus', unmute, true);
+      frame.addEventListener('blur', mute, true);
+      // Mobile/touch: tap toggles
+      frame.addEventListener('click', function(){ v.muted ? unmute() : mute(); });
+    })();
+  </script>
+</section>
+
+<!-- ABOUT + FOOTER (Video Background) -->
+<div class="footer-video-section">
+  <video class="footer-video" autoplay muted loop playsinline poster="footer-poster.jpg">
+    <source src="footer-bg.mp4" type="video/mp4">
+  </video>
+  <div class="footer-overlay"></div>
+
+  <section class="about">
+    <h2>What Is Pro Se Network?</h2>
+    <p>Pro Se Network is a free, AI-powered legal help platform built for people who represent themselves in court. Jeremy is a step-by-step divorce engine for New York uncontested divorce, covering intake, verification, document drafting, and NYSCEF filing.</p>
+    <p>Jeremy doesn't replace a lawyer. He helps you understand your rights, prepare your filings, and navigate the system — for $0.</p>
+  </section>
+
+  <footer class="footer">
+    <div class="footer-links">
+      <a href="/whitepaper.html">System Whitepaper</a>
+      <a href="/workflow.html">Workflow Diagram</a>
+      <a href="/JEREMY_DECK.html">Investor Deck</a>
+      <a href="/JEREMY_TECH.html">Technical Deep-Dive</a>
+      <a href="#" data-chat-link="/general/">Ask Jeremy a legal question</a>
+    </div>
+    <p class="disclaimer">Pro Se Network provides legal information, not legal advice. Jeremy is an AI assistant — not an attorney. For complex matters, consult a licensed attorney in your jurisdiction. No attorney-client relationship is formed by using this service.</p>
+  </footer>
+</div>
+
+<!-- DISCLAIMER MODAL -->
+<div class="modal-overlay" id="disclaimerModal" role="dialog" aria-modal="true" aria-labelledby="disclaimerTitle">
+  <div class="modal-card">
+    <div class="modal-icon">&#9878;</div>
+    <h2 id="disclaimerTitle">Before You Talk to Jeremy</h2>
+    <p class="modal-sub">Please read this</p>
+    <ul class="modal-points">
+      <li><strong>Jeremy is an AI legal assistant — not a lawyer.</strong> He provides procedural guidance and legal information, not legal advice.</li>
+      <li><strong>No attorney-client relationship is formed</strong> by talking to Jeremy. Nothing you share is protected by attorney-client privilege.</li>
+      <li><strong>For complex situations</strong> involving custody, criminal charges, abuse, or significant assets — consult a licensed attorney in your jurisdiction.</li>
+      <li><strong>Jeremy can be wrong.</strong> Verify anything important against the actual law in your state before you act on it.</li>
+    </ul>
+    <div class="modal-actions">
+      <button class="modal-btn modal-btn-secondary" id="disclaimerCancel">Not now</button>
+      <button class="modal-btn modal-btn-primary" id="disclaimerContinue">I understand &mdash; Continue</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var c = document.getElementById('scales3d');
+  if (!c) return;
+  var ctx = c.getContext('2d');
+  var W = c.width, H = c.height;
+  var t = 0;
+
+  /* 3D math — same engine as wireframe-generator */
+  function rotX(v,a){var c=Math.cos(a),s=Math.sin(a);return[v[0],v[1]*c-v[2]*s,v[1]*s+v[2]*c];}
+  function rotY(v,a){var c=Math.cos(a),s=Math.sin(a);return[v[0]*c+v[2]*s,v[1],-v[0]*s+v[2]*c];}
+  function rotZ(v,a){var c=Math.cos(a),s=Math.sin(a);return[v[0]*c-v[1]*s,v[0]*s+v[1]*c,v[2]];}
+  function proj(v){var d=500,z=v[2]+6,f=d/z;return[W/2+v[0]*f,H/2-v[1]*f];}
+
+  /* Dynamic geometry — rebuilt each frame for tilting scales */
+  function buildFrame(tilt) {
+    var verts = [], edges = [];
+    function v(x,y,z){ var i=verts.length; verts.push([x,y,z]); return i; }
+    function e(a,b){ edges.push([a,b]); }
+
+    var beamY = 2.0, beamLen = 2.0;
+    var chainDrop = 1.4, panR = 0.65, panN = 8;
+
+    /* ── STATIC PARTS (pillar, fulcrum, base) ── */
+
+    /* Fulcrum pyramid */
+    var ft0=v(0,2.6,0), ft1=v(-0.2,2.3,-0.15), ft2=v(0.2,2.3,-0.15);
+    var ft3=v(-0.2,2.3,0.15), ft4=v(0.2,2.3,0.15);
+    e(ft0,ft1);e(ft0,ft2);e(ft0,ft3);e(ft0,ft4);
+    e(ft1,ft2);e(ft2,ft4);e(ft4,ft3);e(ft3,ft1);
+
+    /* Center pillar */
+    v(0,2.3,0); v(0,-1.2,0); e(verts.length-2,verts.length-1);
+    v(-0.06,2.3,-0.06); v(-0.06,-1.2,-0.06); e(verts.length-2,verts.length-1);
+    v(0.06,2.3,0.06); v(0.06,-1.2,0.06); e(verts.length-2,verts.length-1);
+
+    /* Base pedestal */
+    var pd0=v(-0.6,-1.2,0),pd1=v(0.6,-1.2,0); e(pd0,pd1);
+    var pd2=v(-0.8,-1.5,-0.3),pd3=v(0.8,-1.5,-0.3);
+    var pd4=v(-0.8,-1.5,0.3),pd5=v(0.8,-1.5,0.3);
+    e(pd2,pd3);e(pd3,pd5);e(pd5,pd4);e(pd4,pd2);
+    e(pd0,pd2);e(pd0,pd4);e(pd1,pd3);e(pd1,pd5);
+    var ps0=v(-1.0,-1.7,-0.4),ps1=v(1.0,-1.7,-0.4);
+    var ps2=v(1.0,-1.7,0.4),ps3=v(-1.0,-1.7,0.4);
+    var ps4=v(-1.0,-1.9,-0.4),ps5=v(1.0,-1.9,-0.4);
+    var ps6=v(1.0,-1.9,0.4),ps7=v(-1.0,-1.9,0.4);
+    e(ps0,ps1);e(ps1,ps2);e(ps2,ps3);e(ps3,ps0);
+    e(ps4,ps5);e(ps5,ps6);e(ps6,ps7);e(ps7,ps4);
+    e(ps0,ps4);e(ps1,ps5);e(ps2,ps6);e(ps3,ps7);
+    e(pd2,ps0);e(pd3,ps1);e(pd5,ps2);e(pd4,ps3);
+
+    /* ── DYNAMIC PARTS (beam tilts, pans follow) ── */
+
+    /* Beam endpoints computed from tilt */
+    var cosT = Math.cos(tilt), sinT = Math.sin(tilt);
+    var lbx = -beamLen * cosT, lby = beamY + beamLen * sinT;
+    var rbx =  beamLen * cosT, rby = beamY - beamLen * sinT;
+
+    /* Beam main + depth */
+    var b0=v(lbx,lby,0), b1=v(rbx,rby,0); e(b0,b1);
+    var b2=v(lbx,lby,-0.1),b3=v(rbx,rby,-0.1); e(b2,b3);
+    var b4=v(lbx,lby,0.1),b5=v(rbx,rby,0.1); e(b4,b5);
+    e(b0,b2);e(b0,b4);e(b1,b3);e(b1,b5);
+
+    /* Beam end cubes */
+    var bsz=0.12;
+    function beamCube(cx,cy){
+      var a0=v(cx-bsz,cy-bsz,-bsz),a1=v(cx+bsz,cy-bsz,-bsz);
+      var a2=v(cx+bsz,cy+bsz,-bsz),a3=v(cx-bsz,cy+bsz,-bsz);
+      var a4=v(cx-bsz,cy-bsz,bsz),a5=v(cx+bsz,cy-bsz,bsz);
+      var a6=v(cx+bsz,cy+bsz,bsz),a7=v(cx-bsz,cy+bsz,bsz);
+      e(a0,a1);e(a1,a2);e(a2,a3);e(a3,a0);
+      e(a4,a5);e(a5,a6);e(a6,a7);e(a7,a4);
+      e(a0,a4);e(a1,a5);e(a2,a6);e(a3,a7);
+    }
+    beamCube(lbx,lby);
+    beamCube(rbx,rby);
+
+    /* Left side — chains hang straight down from tilted beam end */
+    var lpY = lby - chainDrop;  /* pan Y follows beam end */
+    e(v(lbx,lby,0), v(lbx-0.5,lpY,-0.3));
+    e(v(lbx,lby,0), v(lbx+0.5,lpY,-0.3));
+    e(v(lbx,lby,0), v(lbx-0.5,lpY,0.3));
+    e(v(lbx,lby,0), v(lbx+0.5,lpY,0.3));
+
+    /* Left pan (octagon) */
+    var lpTop=[],lpBot=[];
+    for(var i=0;i<panN;i++){
+      var a=i*Math.PI*2/panN;
+      lpTop.push(v(lbx+Math.cos(a)*panR,lpY,Math.sin(a)*panR));
+      lpBot.push(v(lbx+Math.cos(a)*panR*0.5,lpY-0.25,Math.sin(a)*panR*0.5));
+    }
+    for(var i=0;i<panN;i++){e(lpTop[i],lpTop[(i+1)%panN]);e(lpBot[i],lpBot[(i+1)%panN]);e(lpTop[i],lpBot[i]);}
+
+    /* Right side — chains hang straight down */
+    var rpY = rby - chainDrop;
+    e(v(rbx,rby,0), v(rbx-0.5,rpY,-0.3));
+    e(v(rbx,rby,0), v(rbx+0.5,rpY,-0.3));
+    e(v(rbx,rby,0), v(rbx-0.5,rpY,0.3));
+    e(v(rbx,rby,0), v(rbx+0.5,rpY,0.3));
+
+    /* Right pan (octagon) */
+    var rpTop=[],rpBot=[];
+    for(var i=0;i<panN;i++){
+      var a=i*Math.PI*2/panN;
+      rpTop.push(v(rbx+Math.cos(a)*panR,rpY,Math.sin(a)*panR));
+      rpBot.push(v(rbx+Math.cos(a)*panR*0.5,rpY-0.25,Math.sin(a)*panR*0.5));
+    }
+    for(var i=0;i<panN;i++){e(rpTop[i],rpTop[(i+1)%panN]);e(rpBot[i],rpBot[(i+1)%panN]);e(rpTop[i],rpBot[i]);}
+
+    return {verts:verts, edges:edges, apex:ft0};
+  }
+
+  /* Render loop */
+  function render(){
+    requestAnimationFrame(render);
+    t += 0.012;
+    ctx.clearRect(0,0,W,H);
+
+    /* Tilt oscillates — left goes down, right goes up, then swaps */
+    var tilt = Math.sin(t * 0.6) * 0.15;
+    var camRx = -0.15;
+    var camRy = t;
+
+    /* Build geometry this frame */
+    var frame = buildFrame(tilt);
+    var verts = frame.verts, edges = frame.edges;
+
+    /* Transform and project */
+    var pv=[];
+    for(var i=0;i<verts.length;i++){
+      var p = [verts[i][0], verts[i][1], verts[i][2]];
+      p = rotX(p, camRx);
+      p = rotY(p, camRy);
+      pv.push(proj(p));
+    }
+
+    ctx.lineCap = 'round';
+
+    /* Glow layer */
+    ctx.strokeStyle = 'rgba(212,175,55,0.15)';
+    ctx.lineWidth = 4;
+    ctx.shadowColor = '#D4AF37';
+    ctx.shadowBlur = 12;
+    for(var i=0;i<edges.length;i++){
+      var a=pv[edges[i][0]], b=pv[edges[i][1]];
+      ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);ctx.stroke();
+    }
+    ctx.shadowBlur = 0;
+
+    /* Main wireframe */
+    ctx.strokeStyle = '#D4AF37';
+    ctx.lineWidth = 1.2;
+    for(var i=0;i<edges.length;i++){
+      var a=pv[edges[i][0]], b=pv[edges[i][1]];
+      ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);ctx.stroke();
+    }
+
+    /* Highlight */
+    ctx.strokeStyle = 'rgba(232,204,110,0.4)';
+    ctx.lineWidth = 0.5;
+    for(var i=0;i<edges.length;i++){
+      var a=pv[edges[i][0]], b=pv[edges[i][1]];
+      ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);ctx.stroke();
+    }
+
+    /* Apex eye glow */
+    ctx.fillStyle = '#E8CC6E';
+    ctx.shadowColor = '#D4AF37'; ctx.shadowBlur = 8;
+    var apex=pv[frame.apex];
+    ctx.beginPath();ctx.arc(apex[0],apex[1],3.5,0,Math.PI*2);ctx.fill();
+    ctx.shadowBlur = 0;
+  }
+
+  render();
+})();
+
+/* ═══ DISCLAIMER MODAL — INTERCEPT ALL CHAT LINKS ═══ */
+(function(){
+  const overlay = document.getElementById('disclaimerModal');
+  const continueBtn = document.getElementById('disclaimerContinue');
+  const cancelBtn = document.getElementById('disclaimerCancel');
+  let pendingHref = null;
+
+  function openModal(href){
+    pendingHref = href;
+    overlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeModal(){
+    overlay.classList.remove('active');
+    document.body.style.overflow = '';
+    pendingHref = null;
+  }
+
+  // Intercept every link with data-chat-link
+  document.querySelectorAll('[data-chat-link]').forEach(function(el){
+    el.addEventListener('click', function(e){
+      e.preventDefault();
+      openModal(el.getAttribute('data-chat-link'));
+    });
+  });
+
+  continueBtn.addEventListener('click', function(){
+    if (pendingHref) {
+      try { localStorage.setItem('jeremy_disclaimer_ack', '1'); } catch(e){}
+      window.location.href = pendingHref;
+    }
+  });
+  cancelBtn.addEventListener('click', closeModal);
+  overlay.addEventListener('click', function(e){
+    if (e.target === overlay) closeModal();
+  });
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape' && overlay.classList.contains('active')) closeModal();
+  });
+})();
+</script>
+<script>
+  // Light Mode toggle (paired persona+UI swap)
+  // TODO(yago-phase-1): wire JEREMY_LIGHT_GROUPID once Light Jeremy is built in Video
+  const JEREMY_AVATAR = { dark: '1e7463a2d5af41cb90c9a92e8439fd92', light: 'PENDING_LIGHT_BUILD' };
+  function applyThemeLabel(){
+    const t = document.documentElement.getAttribute('data-theme') || 'dark';
+    const btn = document.getElementById('themeToggle');
+    if (btn) btn.textContent = t === 'light' ? 'Dark' : 'Light';
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', t === 'light' ? '#F2EDE6' : '#080808');
+  }
+  function toggleTheme(){
+    const cur = document.documentElement.getAttribute('data-theme') || 'dark';
+    const next = cur === 'light' ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', next);
+    try { localStorage.setItem('psn-theme', next); } catch(e) {}
+    applyThemeLabel();
+    document.dispatchEvent(new CustomEvent('psn-theme-change', { detail: { theme: next, jeremyGroupId: JEREMY_AVATAR[next] } }));
+  }
+  applyThemeLabel();
+</script>
+</body>
+</html>

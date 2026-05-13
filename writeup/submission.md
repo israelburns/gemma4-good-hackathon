@@ -2,9 +2,9 @@
 
 ## The Problem
 
-80% of low-income Americans cannot afford a lawyer. The number is worse globally — in Kenya, India, Nigeria, and across the developing world, the justice gap is not a statistic. It is a daily reality for millions of people facing evictions, wage theft, wrongful terminations, and civil rights violations with no one in their corner.
+80% of low-income Americans cannot afford a lawyer. Across the developing world, the justice gap is not a statistic. It is a daily reality for millions of people facing evictions, wage theft, wrongful terminations, and civil rights violations with no one in their corner.
 
-A lawyer costs $300+/hour in the U.S. In ***, a single court filing can cost more than a month's income. People file wrong forms. They miss deadlines. They lose cases they should have won — not because they were wrong, but because they couldn't navigate a system built for lawyers.
+A lawyer costs $300+/hour in the U.S. People file wrong forms. They miss deadlines. They lose cases they should have won — not because they were wrong, but because they couldn't navigate a system built for lawyers.
 
 The legal system was built for lawyers. **Jeremy was built for everyone else.**
 
@@ -65,19 +65,14 @@ Fine-tuned Gemma 4 E4B-it with QLoRA (rank 16, 4-bit quantization) on **5,196 le
 | CourtListener API | 1,119 | Real case law extracts |
 | Court self-help guides | 111 | Official court procedures |
 
-Training ran on Kaggle free GPU (T4) in under 2 hours at $0 cost.
+Training ran on Kaggle free GPU (T4, 15.6GB VRAM, sm_75, fp16) in **5h 18m** at $0 cost. 927 steps across 3 epochs, effective batch size 16, gradient accumulation 16, ~25 sec/step, QLoRA r=16 α=32.
+Final eval loss: 2.868 | Final training loss: 0.057
 
 ## Real-World Impact
 
 Jeremy has already been used in active litigation:
 - **McDaniel v. City of New York** (Bronx County Supreme Court, 2026) — Section 1983 civil rights case against 6 NYPD officers. Jeremy helped draft the complaint, demand letter, and preservation notices.
 - Multiple pro se litigants guided through EEOC filings, contract disputes, and eviction defense across New York.
-
-## A Global Perspective
-
-This build has a transatlantic dimension. *******, based in ***, Kenya, tested the platform and helped frame the story from the outside — the perspective of someone who lives the justice gap, not just reads about it. In Kenya and across Sub-Saharan Africa, formal legal representation is inaccessible to the vast majority of people facing civil matters. His perspective shaped a core requirement: any solution worth building must be portable, free, and self-hostable by communities that have never had access to $300/hour counsel.
-
-The choice of Gemma 4 open weights is partly an answer to that question. A model that runs locally, in any language it can be fine-tuned for, on any hardware available — that is a model that can reach ***.
 
 ## What Gemma 4 Brings
 
@@ -87,7 +82,7 @@ Why Gemma 4 over other models?
 2. **Size efficiency** — E4B runs on consumer hardware and mobile devices. Legal help shouldn't require a data center.
 3. **128K context** — Full complaints, contracts, and case law fit in a single prompt.
 4. **Instruction-tuned** — Gemma 4's instruction following maps directly to procedural legal guidance.
-5. **Global deployability** — Fine-tune once for any jurisdiction, any language. The architecture is portable.
+5. **Global deployability** — Fine-tune once for any jurisdiction, any language. The architecture is portable and self-hostable anywhere.
 
 ## Cost
 
@@ -97,8 +92,8 @@ Why Gemma 4 over other models?
 | Gemma 4 inference (self-hosted) | $0 |
 | Training (Kaggle GPU) | $0 |
 | Training data collection | $0 |
-| Voice (ElevenLabs, optional) | $5 |
-| **Total** | **$0 - $5** |
+| Voice (Kokoro TTS, self-hosted) | $0 |
+| **Total** | **$0** |
 
 This is the number that matters for legal aid organizations. $0 to run. $0 per conversation. No budget approval needed.
 
@@ -106,6 +101,7 @@ This is the number that matters for legal aid organizations. $0 to run. $0 per c
 
 - **Live Demo:** [prosenetwork.org/demo](https://prosenetwork.org/demo)
 - **Model:** [huggingface.co/israelburns/jeremy-gemma4](https://huggingface.co/israelburns/jeremy-gemma4)
+- **HF Space Demo:** [huggingface.co/spaces/israelburns/jeremy-gemma4-demo](https://huggingface.co/spaces/israelburns/jeremy-gemma4-demo)
 - **Code:** [github.com/israelburns/gemma4-good-hackathon](https://github.com/israelburns/gemma4-good-hackathon)
 
 Ask Jeremy anything:
@@ -116,5 +112,4 @@ Ask Jeremy anything:
 ## Team
 
 - **Israel "Ace" Burns** — Cornell Tech LLM '17, Co-Founder, New York
-- **Esco Obong** — Co-Founder & Technical Lead, New York
-- ******* — Presenter & Global Tester, ***, Kenya
+- **Esco Obong** — Co-Owner & Technical Lead, New York
