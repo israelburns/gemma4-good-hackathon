@@ -49,6 +49,10 @@ def log(m): print(f"  {m}", flush=True)
 DRAFT_KW = ("draft", "write a", "compose", "prepare a motion", "prepare an",
             "memorandum", "complaint", "petition", "clause", "provision")
 
+# v3_gold 'area' values that are genuinely on-domain for a divorce assistant.
+_V3_FAMILY_AREAS = {"custody", "family_law", "child_support", "domestic_violence",
+                    "matrimonial", "divorce"}
+
 def pull_v3_gold():
     p = hf_hub_download(HF_REPO, "jeremy_training_v3.jsonl",
                         repo_type="dataset", token=HF_TOKEN)
@@ -63,15 +67,20 @@ def pull_v3_gold():
             "structured_to_guidance" if task == "safety_compliance" else None)
         if not bucket:
             continue
+        # Tag family-law-area rows as a distinct, higher-priority source so they
+        # win narrative/structured slots over employment / police-misconduct v3.
+        area = (r.get("area") or "").lower()
+        src = "v3_gold_family" if area in _V3_FAMILY_AREAS else "v3_gold"
         rows.append({
             "task_type":    bucket,
             "instruction":  (r.get("instruction") or "").strip(),
             "input":        "",
             "response":     (r.get("response") or "").strip(),
-            "source":       "v3_gold",
+            "source":       src,
             "jurisdiction": r.get("jurisdiction", ""),
         })
-    log(f"v3_gold: {len(rows)} rows")
+    fam = sum(1 for r in rows if r["source"] == "v3_gold_family")
+    log(f"v3_gold: {len(rows)} rows ({fam} family-area, prioritized)")
     return rows
 
 def pull_lawyer_instruct(cap=2500):
@@ -148,6 +157,180 @@ def pull_cuad():
                 "jurisdiction": "",
             })
     log(f"cuad: {len(rows)} rows (dropped {dropped_neg} negative-polarity excerpts)")
+    return rows
+
+# ─────────────────────────────────────────────────────────────────────────────
+# DIVORCE-NATIVE SOURCE — the actual NY uncontested-divorce UD workflow that
+# ships inside the Jeremy project (pro-se-network/src). Authoritative,
+# hand-authored, NY-specific. This is the on-domain signal the HF datasets
+# could not provide (Kimi Stage 5 BLOCKER 3 fix).
+# ─────────────────────────────────────────────────────────────────────────────
+
+DIVORCE_SRC = "/Users/adam15obong/Documents/Money_Codes/pro-se-network/src"
+
+def _flatten(v, depth=0):
+    """Render a nested str/list/dict value as readable prose."""
+    if isinstance(v, str):
+        return v.strip()
+    if isinstance(v, (int, float, bool)):
+        return str(v)
+    if isinstance(v, list):
+        parts = [_flatten(x, depth + 1) for x in v]
+        return "\n".join(f"- {p}" for p in parts if p)
+    if isinstance(v, dict):
+        out = []
+        for k, val in v.items():
+            t = _flatten(val, depth + 1)
+            if t:
+                label = str(k).replace("_", " ")
+                out.append(f"{label}: {t}" if "\n" not in t else f"{label}:\n{t}")
+        return "\n".join(out)
+    return ""
+
+# Per-structure instruction framing — keeps the generated question on-domain
+# and specific instead of a generic "explain this".
+_DIVORCE_STRUCTS = {
+    # module, attr, title_keys, instruction_template
+    ("divorce_workflow", "UD_FORMS"):          ("In a New York uncontested divorce, what is form {title} and when is it filed?"),
+    ("divorce_workflow", "ORDER_OF_OPERATIONS"):("In a New York uncontested divorce, what does this step involve: {title}?"),
+    ("divorce_workflow", "EDGE_CASES"):        ("While filing a New York uncontested divorce pro se: {title}. What should I do?"),
+    ("divorce_workflow", "STOP_TRIGGERS"):     ("When filing for divorce pro se in New York, should I stop and consult an attorney if: {title}?"),
+    ("divorce_workflow", "CHECKLISTS"):        ("What belongs on the {title} checklist for a New York uncontested divorce?"),
+    ("divorce_workflow", "CRITICAL_WARNINGS"): ("What is a critical warning I must know when filing a New York uncontested divorce pro se?"),
+    ("divorce_workflow", "INTAKE_FIELDS"):     ("What information do I need to provide for the '{title}' field when preparing New York divorce paperwork, and why?"),
+    ("divorce_basics",   "DIVORCE_TYPES"):     ("Explain the '{title}' option for someone deciding how to approach their divorce."),
+    ("divorce_basics",   "PROPERTY_DIVISION"): ("How does '{title}' work when dividing property in a divorce?"),
+    ("divorce_basics",   "ALIMONY_TYPES"):     ("Explain '{title}' alimony — what it is and when a court awards it."),
+    ("divorce_basics",   "STATE_PROCEDURES"):  ("What is the divorce procedure in {title}?"),
+    ("default_judgment_guide", "DEFAULT_TYPES"):     ("In civil litigation, explain '{title}' — what it is and how it works."),
+    ("default_judgment_guide", "DEFAULT_PROCEDURES"):("What is the step-by-step default-judgment procedure for the {title}?"),
+    ("default_judgment_guide", "VACATING_GROUNDS"):  ("Can a default judgment be vacated on the ground of '{title}'? Explain."),
+    ("default_judgment_guide", "DEFAULT_PREVENTION_TIPS"):("How can a defendant avoid having a default judgment entered against them?"),
+    ("judgment_collection", "COLLECTION_METHODS"):   ("How does the '{title}' method of collecting on a judgment work?"),
+}
+
+def pull_divorce_native():
+    import importlib
+    if DIVORCE_SRC not in os.sys.path:
+        os.sys.path.insert(0, DIVORCE_SRC)
+    rows = []
+    for (modname, attr), instr_tmpl in _DIVORCE_STRUCTS.items():
+        try:
+            mod = importlib.import_module(modname)
+            struct = getattr(mod, attr)
+        except Exception as e:
+            log(f"  divorce_native skip {modname}.{attr}: {str(e)[:60]}")
+            continue
+        # normalize to a list of (title, value) entries
+        entries = []
+        if isinstance(struct, dict):
+            for k, v in struct.items():
+                title = (v.get("name") or v.get("label") or v.get("title")
+                         or v.get("category") or str(k).replace("_", " ")) if isinstance(v, dict) else str(k)
+                entries.append((title, v))
+        elif isinstance(struct, list):
+            for item in struct:
+                if isinstance(item, dict):
+                    title = (item.get("name") or item.get("label") or item.get("title")
+                             or item.get("form_id") or item.get("scenario")
+                             or (f"step {item.get('step')} — {item.get('summary','')}"
+                                 if item.get("step") else "") or "")
+                else:
+                    title = ""
+                entries.append((title, item))
+        for title, value in entries:
+            body = _flatten(value)
+            if len(body) < 150:
+                continue
+            instr = instr_tmpl.format(title=str(title).strip()[:120]) if "{title}" in instr_tmpl else instr_tmpl
+            rows.append({
+                "task_type":    "structured_to_guidance",
+                "instruction":  instr,
+                "input":        "",
+                "response":     ("This is procedural legal information for New York, "
+                                 "not legal advice.\n\n" + body),
+                "source":       f"divorce_native:{attr}",
+                "jurisdiction": "NY",
+            })
+    log(f"divorce_native: {len(rows)} rows (NY uncontested-divorce UD workflow)")
+    return rows
+
+def pull_ud_documents():
+    """Run the project's own NY UD-1..UD-12 document generators over a spread of
+    synthetic uncontested-divorce cases. Each (case x form) is a real, correctly
+    structured NY divorce document — authoritative draft_document_section signal.
+    Legal forms ARE templated; these are intentionally exempt from near-dedup."""
+    import importlib
+    if DIVORCE_SRC not in os.sys.path:
+        os.sys.path.insert(0, DIVORCE_SRC)
+    try:
+        udt = importlib.import_module("ud_document_templates")
+    except Exception as e:
+        log(f"  ud_documents skip: {str(e)[:80]}")
+        return []
+
+    first = ["Maria","James","Aisha","Robert","Linda","Carlos","Wei","Sarah","David","Nadia",
+             "Michael","Elena","Thomas","Grace","Omar","Patricia","Kevin","Rosa","Daniel","Joyce",
+             "Andre","Fatima","Steven","Camille","Jonah"]
+    last  = ["Rivera","Thompson","Okafor","Chen","Walsh","Delgado","Park","Hughes","Bennett","Haddad",
+             "Russo","Petrov","Coleman","Nguyen","Bauer","Flores","Sullivan","Marino","Brooks","Kim",
+             "Foster","Abboud","Greene","Laurent","Stein"]
+    streets = ["12 Bay Street","88 Victory Boulevard","240 Forest Avenue","57 Richmond Terrace",
+               "910 Castleton Avenue","33 Hyatt Street","145 Targee Street","76 St Marks Place",
+               "501 Port Richmond Avenue","219 Bard Avenue"]
+    mplaces = ["Staten Island, NY","Manhattan, NY","Brooklyn, NY","Newark, NJ","Philadelphia, PA",
+               "Jersey City, NJ","Queens, NY","Yonkers, NY"]
+    res_bases = ["plaintiff_richmond","defendant_richmond","married_in_ny",
+                 "both_ny_resident","grounds_in_ny","two_year"]
+    zips = ["10301","10302","10303","10304","10305","10306","10310","10314"]
+
+    rows = []
+    for i in range(25):
+        pf, pl = first[i], last[i]
+        df, dl = first[(i + 7) % 25], last[(i + 13) % 25]
+        data = {
+            "plaintiff_name":    f"{pf} {pl}",
+            "plaintiff_address": f"{streets[i % len(streets)]}, Staten Island, NY {zips[i % len(zips)]}",
+            "defendant_name":    f"{df} {dl}",
+            "defendant_address": f"{streets[(i + 5) % len(streets)]}, Staten Island, NY {zips[(i + 3) % len(zips)]}",
+            "marriage_date":     f"{2005 + (i % 15)}-{1 + (i % 9):02d}-{1 + (i % 27):02d}",
+            "marriage_place":    mplaces[i % len(mplaces)],
+            "irretrievable_breakdown": True, "no_children": True,
+            "no_property": True, "both_cooperate": True,
+            "residency_basis":   res_bases[i % 6],
+            "service_method":    "process_server" if i % 2 else "personal_nonparty",
+            "notary_plan":       "separate_notary",
+            "index_number":      f"{150000 + i * 37}/2026",
+            "plaintiff_county":  "Richmond", "defendant_county": "Richmond",
+            "server_name":       f"{first[(i + 3) % 25]} {last[(i + 9) % 25]}",
+            "server_address":    f"{streets[(i + 2) % len(streets)]}, Staten Island, NY {zips[(i + 1) % len(zips)]}",
+            "service_date":      f"2026-{1 + (i % 9):02d}-{2 + (i % 26):02d}",
+            "service_time":      f"{9 + (i % 8)}:00 AM",
+            "service_location":  f"{streets[(i + 5) % len(streets)]}, Staten Island, NY {zips[(i + 3) % len(zips)]}",
+            "defendant_description": "as identified at the address of service",
+        }
+        try:
+            result = udt.generate_ud_documents(data)
+        except Exception as e:
+            log(f"  ud_documents case {i} failed: {str(e)[:60]}")
+            continue
+        facts = (f"Plaintiff {data['plaintiff_name']} v. Defendant {data['defendant_name']}; "
+                 f"Richmond County, New York; married {data['marriage_date']} in "
+                 f"{data['marriage_place']}; no children under 21; no marital property or "
+                 f"maintenance; no-fault grounds (irretrievable breakdown, DRL §170(7)).")
+        for doc in result.get("documents", []):
+            if not doc.get("success") or len(doc.get("full_text", "")) < 150:
+                continue
+            rows.append({
+                "task_type":    "draft_document_section",
+                "instruction":  (f"Draft a {doc['form_id']} ({doc['title']}) for a New York "
+                                 f"uncontested divorce. Case facts: {facts}"),
+                "input":        "",
+                "response":     doc["full_text"],
+                "source":       f"ud_template:{doc['form_id']}",
+                "jurisdiction": "NY",
+            })
+    log(f"ud_documents: {len(rows)} rows (synthetic NY divorce UD drafts, dedup-exempt)")
     return rows
 
 def pull_ledgar(cap=2000):
@@ -342,11 +525,25 @@ def _is_dup(g, kept_grams):
                 return True
     return False
 
+# Source priority — lower = kept first. On-domain NY divorce content (the UD
+# workflow + generated UD documents) wins every slot it can; v3_gold (curated
+# Jeremy data) next; generic legal last.
+_SRC_PRIORITY = {"divorce_native": 0, "ud_template": 0, "v3_gold_family": 0, "v3_gold": 1}
+def _priority(r):
+    return _SRC_PRIORITY.get(r["source"].split(":")[0], 2)
+
+# Legal document templates are SUPPOSED to be near-identical across cases —
+# templated repetition with varied field-fills IS the drafting signal. Exempt
+# them from near-dedup (they still pass MD5 exact dedup).
+_DEDUP_EXEMPT = {"ud_template"}
+
 def semantic_dedup_and_slice(rows):
     final = []
     for bucket in BUCKETS:
         pool = [r for r in rows if r["task_type"] == bucket]
-        pool.sort(key=lambda r: len(r["response"]), reverse=True)  # richest first
+        # priority first, then richest response — divorce content is never
+        # displaced by longer-but-generic legal text
+        pool.sort(key=lambda r: (_priority(r), -len(r["response"])))
         if not pool:
             log(f"  {bucket}: EMPTY POOL"); continue
         target  = BUCKET_TARGET[bucket]
@@ -359,6 +556,11 @@ def semantic_dedup_and_slice(rows):
                 break
             is_v3 = r["source"] == "v3_gold"
             if is_v3 and v3_count >= ceiling:
+                continue
+            src = r["source"].split(":")[0]
+            if src in _DEDUP_EXEMPT:
+                # legal templates: templated repetition is the signal — keep
+                kept.append(r); kept_grams.append(_ngrams(r["response"]))
                 continue
             g = _ngrams(r["response"])
             if _is_dup(g, kept_grams):
@@ -393,6 +595,8 @@ def semantic_dedup_and_slice(rows):
 def main():
     print("=== STAGE 4.1 — OVERSAMPLED PULL ===")
     raw = []
+    raw += pull_divorce_native()   # on-domain NY divorce UD workflow guidance
+    raw += pull_ud_documents()     # on-domain NY divorce UD-1..UD-12 drafts
     raw += pull_v3_gold()
     raw += pull_lawyer_instruct()
     raw += pull_cuad()
