@@ -10,12 +10,18 @@ os.environ["BITSANDBYTES_NOWELCOME"] = "1"
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 os.environ["HF_HUB_ENABLE_HF_TRANSFER"] = "1"
-try:
+HF_TOKEN = ""
+try:                                          # Kaggle
     from kaggle_secrets import UserSecretsClient
     HF_TOKEN = UserSecretsClient().get_secret("HF_TOKEN")
-    os.environ["HF_TOKEN"] = HF_TOKEN
 except Exception:
-    HF_TOKEN = os.environ.get("HF_TOKEN", "")
+    try:                                      # Google Colab
+        from google.colab import userdata
+        HF_TOKEN = userdata.get("HF_TOKEN")
+    except Exception:                         # local / generic env
+        HF_TOKEN = os.environ.get("HF_TOKEN", "")
+os.environ["HF_TOKEN"] = HF_TOKEN or ""
+assert HF_TOKEN, "HF_TOKEN not found — set it as a Kaggle/Colab secret or env var"
 
 subprocess.check_call([
     sys.executable, "-m", "pip", "install", "-q",
@@ -89,8 +95,11 @@ print(f"Train: {len(train_data)} | Eval: {len(eval_data)}")
 
 # Codex-verified model ID — unsloth/gemma-4-e4b-it-bnb-4bit does NOT exist
 MODEL_ID = "unsloth/gemma-4-E4B-it-unsloth-bnb-4bit"
-MAX_SEQ = 1024
-OUTPUT_DIR = "/kaggle/working/jeremy-gemma4"
+MAX_SEQ = 2048   # Kimi Stage 5 Fix F — 1024 truncated long UD documents mid-doc
+# Kaggle uses /kaggle/working; Colab uses /content; fall back to cwd elsewhere
+OUTPUT_DIR = ("/kaggle/working/jeremy-gemma4" if os.path.isdir("/kaggle/working")
+              else "/content/jeremy-gemma4" if os.path.isdir("/content")
+              else "./jeremy-gemma4")
 
 print(f"\nLoading {MODEL_ID} via Unsloth...")
 
